@@ -1,10 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\Suffix;
 use Inertia\Inertia;
+use App\Http\Controllers\VCardController;
+
+Route::post('/vcard', [VCardController::class, 'store'])->name('vcard.store');
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    $suffixes = Suffix::all(['id', 'sfx_name']);
+    return Inertia::render('welcome', [
+        'suffixes' => $suffixes,
+    ]);
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {

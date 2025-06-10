@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('full_names', function (Blueprint $table) {
-            $table->id();
+            $table->id('vcard_id');
+            $table->string('vcard_fname');
+            $table->string('vcard_mname')->nullable();
+            $table->string('vcard_lname');
+            $table->unsignedBigInteger('vcard_suffix')->default(0);
+            $table->foreign('vcard_suffix')->references('id')->on('suffixes');
             $table->timestamps();
         });
     }
