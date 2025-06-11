@@ -1,23 +1,55 @@
 import React, { useState } from 'react';
 import { usePage, useForm } from '@inertiajs/react';
+import ContactSection from '../components/ContactSection';
+import ImageSection from '../components/ImageSection';
+import SocialSection from '../components/SocialSection';
+import WorkSection from '../components/WorkSection';
+import WorkAddressSection from '../components/WorkAddressSection';
 
 type Suffix = {
     id: number;
     sfx_name: string;
 };
 
+type FormDataType = {
+    vcard_fname: string;
+    vcard_mname: string;
+    vcard_lname: string;
+    vcard_suffix: string;
+    con_email: string;
+    con_phone: string;
+    img_photo: string | File | null;
+    img_logo: string | File | null;
+    soc_linkedin: string;
+    soc_twitter: string;
+    soc_facebook: string;
+    soc_instagram: string;
+    soc_youtube: string;
+    soc_customlink: string;
+    wrk_org: string;
+    wkr_email: string;
+    wrk_title: string;
+    wrk_role: string;
+    wrk_URL: string;
+    wa_street: string;
+    wa_city: string;
+    wa_state: string;
+    wa_postal_code: string;
+    wa_country: string;
+};
+
 export default function WelcomeForm() {
     const { suffixes } = usePage<{ suffixes: Suffix[] }>().props;
 
-    const {data, setData, post, processing, errors} = useForm({
+    const { data, setData, post, processing, errors } = useForm<FormDataType>({
         vcard_fname: '',
         vcard_mname: '',
         vcard_lname: '',
         vcard_suffix: '',
         con_email: '',
         con_phone: '',
-        img_photo: '',
-        img_logo: '',
+        img_photo: null,
+        img_logo: null,
         soc_linkedin: '',
         soc_twitter: '',
         soc_facebook: '',
@@ -36,109 +68,261 @@ export default function WelcomeForm() {
         wa_country: '',
     });
 
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    const [logoPreview, setLogoPreview] = useState<string | null>(null);
+    const [generatedVCard, setGeneratedVCard] = useState<string | null>(null);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setData(e.target.name as keyof typeof data, e.target.value);
+        if (e.target instanceof HTMLInputElement && e.target.type === "file") {
+            const file = e.target.files ? e.target.files[0] : null;
+            setData(e.target.name as keyof typeof data, file);
+
+            // Preview for images
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    if (e.target.name === "img_photo") setPhotoPreview(reader.result as string);
+                    if (e.target.name === "img_logo") setLogoPreview(reader.result as string);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                if (e.target.name === "img_photo") setPhotoPreview(null);
+                if (e.target.name === "img_logo") setLogoPreview(null);
+            }
+        } else {
+            setData(e.target.name as keyof typeof data, e.target.value);
+        }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const renderError = (field: keyof FormDataType) =>
+        errors[field] && <div className="text-red-500 text-sm mt-1 flex items-center">
+            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            {errors[field]}
+        </div>;
+
+    const generateVCardData = () => {
+        const vCardData = [
+            'BEGIN:VCARD',
+            'VERSION:3.0',
+            `FN:${data.vcard_fname} ${data.vcard_mname} ${data.vcard_lname}`,
+            `N:${data.vcard_lname};${data.vcard_fname};${data.vcard_mname};;`,
+            `EMAIL:${data.con_email}`,
+            `TEL:${data.con_phone}`,
+            `ORG:${data.wrk_org}`,
+            `TITLE:${data.wrk_title}`,
+            `ROLE:${data.wrk_role}`,
+            `EMAIL;TYPE=WORK:${data.wkr_email}`,
+            `URL:${data.wrk_URL}`,
+            `ADR;TYPE=WORK:;;${data.wa_street};${data.wa_city};${data.wa_state};${data.wa_postal_code};${data.wa_country}`,
+            data.soc_linkedin ? `URL;TYPE=LinkedIn:${data.soc_linkedin}` : '',
+            data.soc_twitter ? `URL;TYPE=Twitter:${data.soc_twitter}` : '',
+            data.soc_facebook ? `URL;TYPE=Facebook:${data.soc_facebook}` : '',
+            data.soc_instagram ? `URL;TYPE=Instagram:${data.soc_instagram}` : '',
+            data.soc_youtube ? `URL;TYPE=YouTube:${data.soc_youtube}` : '',
+            data.soc_customlink ? `URL;TYPE=Custom:${data.soc_customlink}` : '',
+            'END:VCARD'
+        ].filter(line => line.trim() !== '').join('\n');
+        
+        return vCardData;
+    };
+
+    const handleDownloadVCard = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('vcard.store'));
+        
+        const vCardData = generateVCardData();
+        const blob = new Blob([vCardData], { type: 'text/vcard' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${data.vcard_fname}_${data.vcard_lname}_vcard.vcf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    };
+
+    const handleGenerateQRCode = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        const vCardData = generateVCardData();
+        setGeneratedVCard(vCardData);
+        
+        // Generate QR Code using a QR code library or API
+        try {
+            // Using qrcode library (you'll need to install it: npm install qrcode)
+            const QRCode = require('qrcode');
+            const qrCodeDataURL = await QRCode.toDataURL(vCardData, {
+                width: 512,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            });
+            
+            // Create download link for QR code
+            const link = document.createElement('a');
+            link.href = qrCodeDataURL;
+            link.download = `${data.vcard_fname}_${data.vcard_lname}_qrcode.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error generating QR code:', error);
+            // Fallback: open QR code generator service
+            const encodedVCard = encodeURIComponent(vCardData);
+            window.open(`https://api.qrserver.com/v1/create-qr-code/?size=512x512&data=${encodedVCard}`, '_blank');
+        }
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-[#FDFDFC]">
-            <form onSubmit={handleSubmit} className="text-black bg-white p-8 rounded shadow-md w-full max-w-lg">
-                <h2 className="text-xl font-bold mb-4">Create Your VCard</h2>
-                <div className="mb-2">
-                    <label>First Name</label>
-                    <input name="vcard_fname" value={data.vcard_fname} onChange={handleChange} className="input" required />
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8 px-4">
+            <div className="max-w-6xl mx-auto">
+                {/* Header */}
+                <div className="text-center mb-8">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-4">
+                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0" />
+                        </svg>
+                    </div>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-2">Create Your VCard</h1>
+                    <p className="text-lg text-gray-600">Generate a professional digital business card in minutes</p>
                 </div>
-                <div className="mb-2">
-                    <label>Middle Name</label>
-                    <input name="vcard_mname" value={data.vcard_mname} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>Last Name</label>
-                    <input name="vcard_lname" value={data.vcard_lname} onChange={handleChange} className="input" required />
-                </div>
-                <div className="mb-2">
-                    <label>Suffix</label>
-                    <select
-                        name="vcard_suffix"
-                        value={data.vcard_suffix}
-                        onChange={handleChange}
-                        className="input"
-                    >
-                        <option value="">Select Suffix</option>
-                        {suffixes.map((opt: Suffix) => (
-                            <option key={opt.id} value={opt.id}>
-                                {opt.sfx_name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="mb-2">
-                    <label>Email</label>
-                    <input name="con_email" value={data.con_email} onChange={handleChange} className="input" type="email" />
-                </div>
-                <div className="mb-2">
-                    <label>Phone</label>
-                    <input name="con_phone" value={data.con_phone} onChange={handleChange} className="input" type="tel" />
-                </div>
-                <div className="mb-2">
-                    <label>Photo URL</label>
-                    <input name="img_photo" value={data.img_photo} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>Logo URL</label>
-                    <input name="img_logo" value={data.img_logo} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>LinkedIn</label>
-                    <input name="soc_linkedin" value={data.soc_linkedin} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>Twitter</label>
-                    <input name="soc_twitter" value={data.soc_twitter} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>Facebook</label>
-                    <input name="soc_facebook" value={data.soc_facebook} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>Instagram</label>
-                    <input name="soc_instagram" value={data.soc_instagram} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>YouTube</label>
-                    <input name="soc_youtube" value={data.soc_youtube} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>Custom Link</label>
-                    <input name="soc_customlink" value={data.soc_customlink} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>Organization</label>
-                    <input name="wrk_org" value={data.wrk_org} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>Work Email</label>
-                    <input name="wkr_email" value={data.wkr_email} onChange={handleChange} className="input" type="email" />
-                </div>
-                <div className="mb-2">
-                    <label>Title</label>
-                    <input name="wrk_title" value={data.wrk_title} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>Role</label>
-                    <input name="wrk_role" value={data.wrk_role} onChange={handleChange} className="input" />
-                </div>
-                <div className="mb-2">
-                    <label>Work URL</label>
-                    <input name="wrk_URL" value={data.wrk_URL} onChange={handleChange} className="input" />
-                </div>
-                <button type="submit" className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Save VCard</button>
-            </form>
+
+                <form className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    {/* Progress indicator */}
+                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-2"></div>
+                    
+                    <div className="p-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* Left Column */}
+                            <div className="space-y-8">
+                                {/* Personal Info */}
+                                <div className="bg-gray-50 rounded-xl p-6">
+                                    <div className="flex items-center mb-4">
+                                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                        </div>
+                                        <h3 className="text-xl font-semibold text-gray-900">Personal Information</h3>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label htmlFor="vcard_fname" className="block text-sm font-medium text-gray-700 mb-2">
+                                                First Name <span className="text-red-500">*</span>
+                                            </label>
+                                            <input 
+                                                id="vcard_fname" 
+                                                name="vcard_fname" 
+                                                value={data.vcard_fname} 
+                                                onChange={handleChange} 
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                                                placeholder="Enter first name"
+                                                required 
+                                            />
+                                            {renderError('vcard_fname')}
+                                        </div>
+                                        <div>
+                                            <label htmlFor="vcard_mname" className="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
+                                            <input 
+                                                id="vcard_mname" 
+                                                name="vcard_mname" 
+                                                value={data.vcard_mname} 
+                                                onChange={handleChange} 
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                                placeholder="Enter middle name"
+                                            />
+                                            {renderError('vcard_mname')}
+                                        </div>
+                                        <div>
+                                            <label htmlFor="vcard_lname" className="block text-sm font-medium text-gray-700 mb-2">
+                                                Last Name <span className="text-red-500">*</span>
+                                            </label>
+                                            <input 
+                                                id="vcard_lname" 
+                                                name="vcard_lname" 
+                                                value={data.vcard_lname} 
+                                                onChange={handleChange} 
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                                placeholder="Enter last name"
+                                                required 
+                                            />
+                                            {renderError('vcard_lname')}
+                                        </div>
+                                        <div>
+                                            <label htmlFor="vcard_suffix" className="block text-sm font-medium text-gray-700 mb-2">Suffix</label>
+                                            <select
+                                                id="vcard_suffix"
+                                                name="vcard_suffix"
+                                                value={data.vcard_suffix}
+                                                onChange={handleChange}
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            >
+                                                <option value="">Select Suffix</option>
+                                                {suffixes.map((opt: Suffix) => (
+                                                    <option key={opt.id} value={opt.id}>
+                                                        {opt.sfx_name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            {renderError('vcard_suffix')}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <ContactSection data={data} handleChange={handleChange} renderError={renderError} />
+                                <ImageSection 
+                                    data={data} 
+                                    handleChange={handleChange} 
+                                    renderError={renderError}
+                                    photoPreview={photoPreview}
+                                    logoPreview={logoPreview}
+                                />
+                            </div>
+
+                            {/* Right Column */}
+                            <div className="space-y-8">
+                                <SocialSection data={data} handleChange={handleChange} renderError={renderError} />
+                                <WorkSection data={data} handleChange={handleChange} renderError={renderError} />
+                                <WorkAddressSection data={data} handleChange={handleChange} renderError={renderError} />
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                            <button
+                                type="button"
+                                onClick={handleDownloadVCard}
+                                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center"
+                                disabled={!data.vcard_fname || !data.vcard_lname || !data.con_email}
+                            >
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Download VCard
+                            </button>
+                            
+                            <button
+                                type="button"
+                                onClick={handleGenerateQRCode}
+                                className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center"
+                                disabled={!data.vcard_fname || !data.vcard_lname || !data.con_email}
+                            >
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                                </svg>
+                                VCard QR Code
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }
+
+export type { FormDataType };
