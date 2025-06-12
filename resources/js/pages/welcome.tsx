@@ -5,6 +5,7 @@ import ImageSection from '../components/ImageSection';
 import SocialSection from '../components/SocialSection';
 import WorkSection from '../components/WorkSection';
 import WorkAddressSection from '../components/WorkAddressSection';
+import PersonalInformationComponent from '../components/PersonalInformationComponent';
 
 type Suffix = {
     id: number;
@@ -178,102 +179,33 @@ export default function WelcomeForm() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8 px-4">
+        <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 py-8 px-4">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{ background: 'linear-gradient(to right, #ff1300, #ff5f00)' }}>
                         <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0" />
                         </svg>
                     </div>
                     <h1 className="text-4xl font-bold text-gray-900 mb-2">Create Your VCard</h1>
-                    <p className="text-lg text-gray-600">Generate a professional digital business card in minutes</p>
+                    <p className="text-lg text-gray-600">Generate a professional digital business card powered by LAVA Automation</p>
                 </div>
 
                 <form className="bg-white rounded-2xl shadow-xl overflow-hidden">
                     {/* Progress indicator */}
-                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-2"></div>
+                    <div className="h-2" style={{ background: 'linear-gradient(to right, #ff1300, #ff5f00)' }}></div>
                     
                     <div className="p-8">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {/* Left Column */}
                             <div className="space-y-8">
-                                {/* Personal Info */}
-                                <div className="bg-gray-50 rounded-xl p-6">
-                                    <div className="flex items-center mb-4">
-                                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                            </svg>
-                                        </div>
-                                        <h3 className="text-xl font-semibold text-gray-900">Personal Information</h3>
-                                    </div>
-                                    
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label htmlFor="vcard_fname" className="block text-sm font-medium text-gray-700 mb-2">
-                                                First Name <span className="text-red-500">*</span>
-                                            </label>
-                                            <input 
-                                                id="vcard_fname" 
-                                                name="vcard_fname" 
-                                                value={data.vcard_fname} 
-                                                onChange={handleChange} 
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
-                                                placeholder="Enter first name"
-                                                required 
-                                            />
-                                            {renderError('vcard_fname')}
-                                        </div>
-                                        <div>
-                                            <label htmlFor="vcard_mname" className="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
-                                            <input 
-                                                id="vcard_mname" 
-                                                name="vcard_mname" 
-                                                value={data.vcard_mname} 
-                                                onChange={handleChange} 
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                placeholder="Enter middle name"
-                                            />
-                                            {renderError('vcard_mname')}
-                                        </div>
-                                        <div>
-                                            <label htmlFor="vcard_lname" className="block text-sm font-medium text-gray-700 mb-2">
-                                                Last Name <span className="text-red-500">*</span>
-                                            </label>
-                                            <input 
-                                                id="vcard_lname" 
-                                                name="vcard_lname" 
-                                                value={data.vcard_lname} 
-                                                onChange={handleChange} 
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                                placeholder="Enter last name"
-                                                required 
-                                            />
-                                            {renderError('vcard_lname')}
-                                        </div>
-                                        <div>
-                                            <label htmlFor="vcard_suffix" className="block text-sm font-medium text-gray-700 mb-2">Suffix</label>
-                                            <select
-                                                id="vcard_suffix"
-                                                name="vcard_suffix"
-                                                value={data.vcard_suffix}
-                                                onChange={handleChange}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                            >
-                                                <option value="">Select Suffix</option>
-                                                {suffixes.map((opt: Suffix) => (
-                                                    <option key={opt.id} value={opt.id}>
-                                                        {opt.sfx_name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            {renderError('vcard_suffix')}
-                                        </div>
-                                    </div>
-                                </div>
-
+                                <PersonalInformationComponent 
+                                    data={data}
+                                    suffixes={suffixes}
+                                    handleChange={handleChange}
+                                    renderError={renderError}
+                                />
                                 <ContactSection data={data} handleChange={handleChange} renderError={renderError} />
                                 <ImageSection 
                                     data={data} 
@@ -294,33 +226,70 @@ export default function WelcomeForm() {
 
                         {/* Action Buttons */}
                         <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            <button
-                                type="button"
-                                onClick={handleDownloadVCard}
-                                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center"
-                                disabled={!data.vcard_fname || !data.vcard_lname || !data.con_email}
-                            >
-                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                Download VCard
-                            </button>
+                            <div className="relative">
+                                {/* Spinning border wrapper */}
+                                <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-spin group-hover:animate-spin" 
+                                    style={{ background: 'conic-gradient(from 0deg, #ff1300, #ff5f00, #ff8533, #ffaa55, #ff1300)' }}>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleDownloadVCard}
+                                    className="relative text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:cursor-pointer hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center overflow-hidden group bg-white"
+                                    style={{ 
+                                        background: 'linear-gradient(45deg, #ff1300, #ff5f00)',
+                                    }}
+                                    disabled={!data.vcard_fname || !data.vcard_lname || !data.con_email}
+                                >
+                                    {/* Animated gradient overlay */}
+                                    <div 
+                                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        style={{
+                                            background: 'linear-gradient(45deg, #ff1300, #ff5f00, #ff8533, #ff1300)',
+                                            backgroundSize: '400% 400%',
+                                            animation: 'gradientShift 2s ease infinite'
+                                        }}
+                                    ></div>
+                                    <svg className="w-5 h-5 mr-2 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span className="relative z-10">Download VCard</span>
+                                </button>
+                            </div>
                             
-                            <button
-                                type="button"
-                                onClick={handleGenerateQRCode}
-                                className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center"
-                                disabled={!data.vcard_fname || !data.vcard_lname || !data.con_email}
-                            >
-                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                                </svg>
-                                VCard QR Code
-                            </button>
+                            <div className="relative">
+                                {/* Spinning border wrapper */}
+                                <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-spin group-hover:animate-spin" 
+                                    style={{ background: 'conic-gradient(from 0deg, #ff5f00, #ff1300, #ff8533, #ffaa55, #ff5f00)' }}>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleGenerateQRCode}
+                                    className="relative text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl hover:cursor-pointer transform hover:scale-105 transition-all duration-200 flex items-center overflow-hidden group bg-white"
+                                    style={{ 
+                                        background: 'linear-gradient(45deg, #ff5f00, #ff1300)',
+                                    }}
+                                    disabled={!data.vcard_fname || !data.vcard_lname || !data.con_email}
+                                >
+                                    {/* Animated gradient overlay */}
+                                    <div 
+                                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        style={{
+                                            background: 'linear-gradient(45deg, #ff5f00, #ff1300, #ff8533, #ff5f00)',
+                                            backgroundSize: '400% 400%',
+                                            animation: 'gradientShift 2s ease infinite'
+                                        }}
+                                    ></div>
+                                    <svg className="w-5 h-5 mr-2 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                                    </svg>
+                                    <span className="relative z-10">VCard QR Code</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>
             </div>
+            <p className="text-center mt-10">© 2025 LAVA Automation. All Rights Reserved.</p>
         </div>
     );
 }
