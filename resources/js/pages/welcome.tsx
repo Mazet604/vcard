@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { usePage, useForm } from '@inertiajs/react';
+import QRCode from 'qrcode';
 import ContactSection from '../components/ContactSection';
 import ImageSection from '../components/ImageSection';
 import SocialSection from '../components/SocialSection';
@@ -103,7 +104,28 @@ export default function WelcomeForm() {
             {errors[field]}
         </div>;
 
-    const generateVCardData = () => {
+    const generateVCardData = async () => {
+        let photoBase64 = '';
+        
+        // Convert photo to base64 if it exists
+        if (data.img_photo && data.img_photo instanceof File) {
+            try {
+                photoBase64 = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const result = reader.result as string;
+                        // Remove data URL prefix to get just the base64 data
+                        const base64Data = result.split(',')[1];
+                        resolve(base64Data);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(data.img_photo as File);
+                });
+            } catch (error) {
+                console.error('Error converting photo to base64:', error);
+            }
+        }
+
         const vCardData = [
             'BEGIN:VCARD',
             'VERSION:3.0',
@@ -123,16 +145,17 @@ export default function WelcomeForm() {
             data.soc_instagram ? `URL;TYPE=Instagram:${data.soc_instagram}` : '',
             data.soc_youtube ? `URL;TYPE=YouTube:${data.soc_youtube}` : '',
             data.soc_customlink ? `URL;TYPE=Custom:${data.soc_customlink}` : '',
+            photoBase64 ? `PHOTO;ENCODING=BASE64;TYPE=JPEG:${photoBase64}` : '',
             'END:VCARD'
         ].filter(line => line.trim() !== '').join('\n');
         
         return vCardData;
     };
 
-    const handleDownloadVCard = (e: React.FormEvent) => {
+    const handleDownloadVCard = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        const vCardData = generateVCardData();
+        const vCardData = await generateVCardData();
         const blob = new Blob([vCardData], { type: 'text/vcard' });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -147,13 +170,11 @@ export default function WelcomeForm() {
     const handleGenerateQRCode = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        const vCardData = generateVCardData();
+        const vCardData = await generateVCardData();
         setGeneratedVCard(vCardData);
         
-        // Generate QR Code using a QR code library or API
+        // Generate QR Code using qrcode library
         try {
-            // Using qrcode library (you'll need to install it: npm install qrcode)
-            const QRCode = require('qrcode');
             const qrCodeDataURL = await QRCode.toDataURL(vCardData, {
                 width: 512,
                 margin: 2,
