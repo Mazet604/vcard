@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import QRCode from 'qrcode';
+import Customization, { backgroundOptions, qrPatterns, BackgroundOption, QRPattern } from './Customization';
 
 type FormDataType = {
     vcard_fname: string;
@@ -40,6 +41,8 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const modalCanvasRef = useRef<HTMLCanvasElement>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedBackground, setSelectedBackground] = useState<BackgroundOption>(backgroundOptions[0]);
+    const [selectedQRPattern, setSelectedQRPattern] = useState<QRPattern>(qrPatterns[0]);
 
     const generateLivePreview = async (canvas: HTMLCanvasElement, isModal = false, isDownload = false) => {
         if (!canvas) return;
@@ -62,10 +65,10 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
         
         const scale = isDownload ? 2.5 : (isModal ? 2 : 1); // Scale factor
         
-        // Background gradient
+        // Background gradient with selected colors
         const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        gradient.addColorStop(0, '#ff1300');
-        gradient.addColorStop(1, '#ff5f00');
+        gradient.addColorStop(0, selectedBackground.gradient[0]);
+        gradient.addColorStop(1, selectedBackground.gradient[1]);
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
@@ -275,35 +278,42 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
             ctx.fillText(`📍 ${shortAddress}`, leftMargin, yPosition);
         }
         
-        // Generate QR Code for preview if website URL is available - positioned in bottom right
+        // Generate QR Code with selected pattern if website URL is available
         if (data.wrk_URL) {
             try {
-                const qrCodeDataURL = await QRCode.toDataURL(data.wrk_URL, {
-                    width: isDownload ? 400 : (isModal ? 160 : 80),
-                    margin: 1,
-                    color: {
-                        dark: '#000000',
-                        light: '#FFFFFF'
-                    }
-                });
+                const qrSize = isDownload ? 400 : (isModal ? 160 : 80);
+                
+                // Build QR options with selected pattern
+                const qrOptions = {
+                    width: qrSize,
+                    type: 'image/png' as const,
+                    rendererOpts: {
+                        quality: 0.92
+                    },
+                    ...selectedQRPattern.options
+                };
+                
+                console.log('Generating QR with pattern:', selectedQRPattern.name, qrOptions); // Debug log
+                
+                const qrCodeDataURL = await QRCode.toDataURL(data.wrk_URL, qrOptions);
                 
                 // Load QR code image
                 const qrImage = new Image();
                 await new Promise<void>((resolve) => {
                     qrImage.onload = () => {
                         // Position QR code in the bottom right corner
-                        const qrSize = 60 * scale;
-                        const qrX = cardX + cardWidth - qrSize - imageMargin;
-                        const qrY = cardY + cardHeight - qrSize - imageMargin - (20 * scale); // Bottom right with margin
+                        const displaySize = 60 * scale;
+                        const qrX = cardX + cardWidth - displaySize - imageMargin;
+                        const qrY = cardY + cardHeight - displaySize - imageMargin - (20 * scale); // Bottom right with margin
                         
                         // Draw QR code
-                        ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize);
+                        ctx.drawImage(qrImage, qrX, qrY, displaySize, displaySize);
                         
                         // Add "Visit Website" text below QR code
                         ctx.font = `bold ${6 * scale}px Arial, sans-serif`;
-                        ctx.fillStyle = '#ff1300';
+                        ctx.fillStyle = '#000000';
                         ctx.textAlign = 'center';
-                        ctx.fillText('Visit Website', qrX + qrSize/2, qrY + qrSize + (10 * scale));
+                        ctx.fillText('Visit Website', qrX + displaySize/2, qrY + displaySize + (10 * scale));
                         
                         // Add website URL below
                         ctx.font = `${5 * scale}px Arial, sans-serif`;
@@ -311,7 +321,7 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
                         const displayURL = data.wrk_URL.replace(/^https?:\/\//, '');
                         const maxURLLength = isDownload ? 50 : (isModal ? 30 : 20);
                         const shortURL = displayURL.length > maxURLLength ? displayURL.substring(0, maxURLLength - 3) + '...' : displayURL;
-                        ctx.fillText(shortURL, qrX + qrSize/2, qrY + qrSize + (18 * scale));
+                        ctx.fillText(shortURL, qrX + displaySize/2, qrY + displaySize + (18 * scale));
                         resolve();
                     };
                     qrImage.onerror = () => resolve();
@@ -363,8 +373,7 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
         }
     };
 
-    // ...existing code for effects and event handlers remains the same...
-    // Update preview when data changes
+    // Update preview when data or customization options change
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             generateSmallPreview();
@@ -374,7 +383,7 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
         }, 300); // Debounce to avoid too many re-renders
         
         return () => clearTimeout(timeoutId);
-    }, [data, isModalOpen]);
+    }, [data, isModalOpen, selectedBackground, selectedQRPattern]);
 
     // Initial preview render
     useEffect(() => {
@@ -382,7 +391,9 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
     }, []);
 
     // Handle canvas click to open modal
-    const handleCanvasClick = () => {
+    const handleCanvasClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
         setIsModalOpen(true);
         // Generate modal preview after a short delay to ensure canvas is rendered
         setTimeout(() => {
@@ -391,7 +402,11 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
     };
 
     // Handle modal close
-    const handleCloseModal = () => {
+    const handleCloseModal = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         setIsModalOpen(false);
     };
 
@@ -399,13 +414,20 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
     useEffect(() => {
         const handleEscapeKey = (event: KeyboardEvent) => {
             if (event.key === 'Escape' && isModalOpen) {
+                event.preventDefault();
                 handleCloseModal();
             }
         };
 
-        document.addEventListener('keydown', handleEscapeKey);
+        if (isModalOpen) {
+            document.addEventListener('keydown', handleEscapeKey);
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+        
         return () => {
             document.removeEventListener('keydown', handleEscapeKey);
+            document.body.style.overflow = 'unset';
         };
     }, [isModalOpen]);
 
@@ -423,13 +445,13 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
                             className="border border-gray-300 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-200"
                             style={{ maxWidth: '100%', height: 'auto' }}
                             onClick={handleCanvasClick}
-                            title="Click to enlarge preview"
+                            title="Click to enlarge and customize"
                         ></canvas>
                         <div className="absolute bottom-2 right-2 bg-orange-200 bg-opacity-75 text-black text-xs px-2 py-1 rounded flex items-center">
                             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
-                            Click to enlarge
+                            Click to customize
                         </div>
                     </div>
                 </div>
@@ -438,14 +460,20 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
                 </p>
             </div>
 
-            {/* Modal for enlarged preview */}
+            {/* Modal for enlarged preview with customization options */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" onClick={handleCloseModal}>
-                    <div className="relative max-w-4xl max-h-screen p-6" onClick={(e) => e.stopPropagation()}>
+                <div 
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4" 
+                    onClick={handleCloseModal}
+                >
+                    <div 
+                        className="relative max-w-6xl max-h-screen bg-white rounded-2xl overflow-hidden" 
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         {/* Close button */}
                         <button
                             onClick={handleCloseModal}
-                            className="absolute -top-2 -right-2 z-10 bg-white text-gray-600 hover:cursor-pointer hover:text-gray-800 rounded-full p-2 shadow-lg transition-colors duration-200"
+                            className="hover:cursor-pointer absolute top-4 right-4 z-10 bg-white text-gray-600 hover:text-gray-800 rounded-full p-2 shadow-lg transition-colors duration-200"
                             title="Close preview (ESC)"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -453,18 +481,30 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
                             </svg>
                         </button>
                         
-                        {/* Modal canvas */}
-                        <canvas 
-                            ref={modalCanvasRef}
-                            className="border border-gray-300 rounded-lg shadow-2xl bg-white"
-                            style={{ maxWidth: '100%', maxHeight: '80vh', height: 'auto' }}
-                        ></canvas>
-                        
-                        {/* Modal footer */}
-                        <div className="text-center mt-4">
-                            <p className="text-white text-sm">
-                                Press <kbd className="bg-gray-700 px-2 py-1 rounded text-xs">ESC</kbd> or click outside to close
-                            </p>
+                        <div className="flex flex-col lg:flex-row">
+                            {/* Customization Panel */}
+                            <Customization
+                                selectedBackground={selectedBackground}
+                                selectedQRPattern={selectedQRPattern}
+                                onBackgroundSelect={setSelectedBackground}
+                                onQRPatternSelect={setSelectedQRPattern}
+                            />
+                            
+                            {/* Preview Canvas */}
+                            <div className="flex-1 p-6 flex flex-col items-center justify-center">
+                                <canvas 
+                                    ref={modalCanvasRef}
+                                    className="border border-gray-300 rounded-lg shadow-2xl bg-white"
+                                    style={{ maxWidth: '100%', maxHeight: '60vh', height: 'auto' }}
+                                ></canvas>
+                                
+                                {/* Modal footer */}
+                                <div className="text-center mt-4">
+                                    <p className="text-gray-600 text-sm">
+                                        Press <kbd className="bg-gray-200 px-2 py-1 rounded text-xs">ESC</kbd> or click outside to close
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
