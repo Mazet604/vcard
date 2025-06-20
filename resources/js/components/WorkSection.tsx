@@ -29,7 +29,7 @@ export default function WorkSection({ data, handleChange, renderError }: WorkSec
                         name="wrk_org" 
                         value={data.wrk_org} 
                         onChange={handleChange} 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                         placeholder="Company name"
                         required 
                     />
@@ -44,7 +44,7 @@ export default function WorkSection({ data, handleChange, renderError }: WorkSec
                         name="wkr_email" 
                         value={data.wkr_email} 
                         onChange={handleChange} 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm" 
                         type="email"
                         placeholder="work.email@company.com"
                         required 
@@ -61,7 +61,7 @@ export default function WorkSection({ data, handleChange, renderError }: WorkSec
                             name="wrk_title" 
                             value={data.wrk_title} 
                             onChange={handleChange} 
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                             placeholder="Accountant"
                             required 
                         />
@@ -76,7 +76,7 @@ export default function WorkSection({ data, handleChange, renderError }: WorkSec
                             name="wrk_role" 
                             value={data.wrk_role} 
                             onChange={handleChange} 
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                             placeholder="Senior Accountant"
                             required 
                         />
@@ -90,7 +90,7 @@ export default function WorkSection({ data, handleChange, renderError }: WorkSec
                         name="wrk_URL" 
                         value={data.wrk_URL} 
                         onChange={handleChange} 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                         placeholder="https://company.com"
                     />
                     {renderError('wrk_URL')}

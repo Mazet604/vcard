@@ -40,7 +40,7 @@ export default function PersonalInformationComponent({
                         name="vcard_fname" 
                         value={data.vcard_fname} 
                         onChange={handleChange} 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200" 
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 placeholder:text-sm" 
                         placeholder="Enter first name"
                         required 
                     />
@@ -53,7 +53,7 @@ export default function PersonalInformationComponent({
                         name="vcard_mname" 
                         value={data.vcard_mname} 
                         onChange={handleChange} 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                         placeholder="Enter middle name"
                     />
                     {renderError('vcard_mname')}
@@ -67,7 +67,7 @@ export default function PersonalInformationComponent({
                         name="vcard_lname" 
                         value={data.vcard_lname} 
                         onChange={handleChange} 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                         placeholder="Enter last name"
                         required 
                     />
@@ -80,7 +80,7 @@ export default function PersonalInformationComponent({
                         name="vcard_suffix"
                         value={data.vcard_suffix}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                     >
                         <option value="">Select Suffix</option>
                         {suffixes.map((opt: Suffix) => (

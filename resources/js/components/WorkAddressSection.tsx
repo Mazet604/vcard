@@ -30,7 +30,7 @@ export default function WorkAddressSection({ data, handleChange, renderError }: 
                         name="wa_street" 
                         value={data.wa_street} 
                         onChange={handleChange} 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                         placeholder="123 Main Street"
                         required 
                     />
@@ -46,7 +46,7 @@ export default function WorkAddressSection({ data, handleChange, renderError }: 
                             name="wa_city" 
                             value={data.wa_city} 
                             onChange={handleChange} 
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                             placeholder="New York"
                             required 
                         />
@@ -61,7 +61,7 @@ export default function WorkAddressSection({ data, handleChange, renderError }: 
                             name="wa_state" 
                             value={data.wa_state} 
                             onChange={handleChange} 
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                             placeholder="NY"
                             required 
                         />
@@ -78,7 +78,7 @@ export default function WorkAddressSection({ data, handleChange, renderError }: 
                             name="wa_postal_code" 
                             value={data.wa_postal_code} 
                             onChange={handleChange} 
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                             placeholder="10001"
                             required 
                         />
@@ -93,7 +93,7 @@ export default function WorkAddressSection({ data, handleChange, renderError }: 
                             name="wa_country" 
                             value={data.wa_country} 
                             onChange={handleChange} 
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm"
                             placeholder="United States"
                             required 
                         />
