@@ -469,7 +469,7 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
                     <div className="relative">
                         <canvas 
                             ref={canvasRef}
-                            className="border border-gray-300 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                            className="border border-gray-300 rounded-lg shadow-md hover:cursor-pointer hover:shadow-lg transition-shadow duration-200"
                             style={{ maxWidth: '100%', height: 'auto' }}
                             onClick={handleCanvasClick}
                             title="Click to enlarge and customize"
