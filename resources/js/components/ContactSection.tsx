@@ -29,7 +29,7 @@ export default function ContactSection({ data, handleChange, renderError }: Cont
                         name="con_email" 
                         value={data.con_email} 
                         onChange={handleChange} 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm" 
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm placeholder:text-sm" 
                         type="email"
                         placeholder="your.email@example.com"
                         required 
@@ -45,7 +45,7 @@ export default function ContactSection({ data, handleChange, renderError }: Cont
                         name="con_phone" 
                         value={data.con_phone} 
                         onChange={handleChange} 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder:text-sm" 
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm placeholder:text-sm" 
                         type="tel"
                         placeholder="+1 (555) 123-4567"
                         required 

@@ -1,6 +1,15 @@
 import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import QRCode from 'qrcode';
-import Customization, { backgroundOptions, qrPatterns, BackgroundOption, QRPattern } from './Customization';
+import Customization, { 
+    backgroundOptions, 
+    qrPatterns, 
+    fieldIcons,
+    BackgroundOption, 
+    QRPattern, 
+    FieldIcons,
+    FieldIconType,
+    FieldIcon
+} from './Customization';
 
 type FormDataType = {
     vcard_fname: string;
@@ -43,6 +52,24 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedBackground, setSelectedBackground] = useState<BackgroundOption>(backgroundOptions[0]);
     const [selectedQRPattern, setSelectedQRPattern] = useState<QRPattern>(qrPatterns[0]);
+    
+    // Initialize field icons with default selections (first icon of each type)
+    const [selectedFieldIcons, setSelectedFieldIcons] = useState<FieldIcons>({
+        phone: fieldIcons.phone[0],
+        email: fieldIcons.email[0],
+        address: fieldIcons.address[0],
+        website: fieldIcons.website[0],
+        company: fieldIcons.company[0],
+        title: fieldIcons.title[0]
+    });
+
+    // Handle field icon selection
+    const handleFieldIconSelect = (field: FieldIconType, icon: FieldIcon) => {
+        setSelectedFieldIcons(prev => ({
+            ...prev,
+            [field]: icon
+        }));
+    };
 
     const generateLivePreview = async (canvas: HTMLCanvasElement, isModal = false, isDownload = false) => {
         if (!canvas) return;
@@ -234,35 +261,35 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
             yPosition += 22 * scale;
         }
         
-        // Role/Organization
+        // Role/Organization with custom icon
         if (data.wrk_role || data.wrk_org) {
             ctx.font = `${11 * scale}px Arial, sans-serif`;
             ctx.fillStyle = '#7f8c8d';
             const roleOrg = [data.wrk_role, data.wrk_org].filter(Boolean).join(' at ');
-            ctx.fillText(roleOrg, leftMargin, yPosition);
+            ctx.fillText(`${selectedFieldIcons.title.emoji} ${roleOrg}`, leftMargin, yPosition);
             yPosition += 18 * scale;
         }
         
-        // Contact information
+        // Contact information with custom icons
         ctx.font = `${9 * scale}px Arial, sans-serif`;
         ctx.fillStyle = '#34495e';
         
         if (data.con_phone) {
-            ctx.fillText(`📞 ${data.con_phone}`, leftMargin, yPosition);
+            ctx.fillText(`${selectedFieldIcons.phone.emoji} ${data.con_phone}`, leftMargin, yPosition);
             yPosition += lineHeight;
         }
         
         if (data.con_email) {
-            ctx.fillText(`✉️ ${data.con_email}`, leftMargin, yPosition);
+            ctx.fillText(`${selectedFieldIcons.email.emoji} ${data.con_email}`, leftMargin, yPosition);
             yPosition += lineHeight;
         }
         
         if (data.wkr_email && data.wkr_email !== data.con_email) {
-            ctx.fillText(`💼 ${data.wkr_email}`, leftMargin, yPosition);
+            ctx.fillText(`${selectedFieldIcons.email.emoji} ${data.wkr_email}`, leftMargin, yPosition);
             yPosition += lineHeight;
         }
         
-        // Address (if available)
+        // Address (if available) with custom icon
         const address = [
             data.wa_street,
             [data.wa_city, data.wa_state].filter(Boolean).join(', '),
@@ -275,7 +302,7 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
             // Truncate long addresses for preview
             const maxLength = isDownload ? 100 : (isModal ? 60 : 40);
             const shortAddress = address.length > maxLength ? address.substring(0, maxLength - 3) + '...' : address;
-            ctx.fillText(`📍 ${shortAddress}`, leftMargin, yPosition);
+            ctx.fillText(`${selectedFieldIcons.address.emoji} ${shortAddress}`, leftMargin, yPosition);
         }
         
         // Generate QR Code with selected pattern if website URL is available
@@ -309,11 +336,11 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
                         // Draw QR code
                         ctx.drawImage(qrImage, qrX, qrY, displaySize, displaySize);
                         
-                        // Add "Visit Website" text below QR code
+                        // Add "Visit Website" text below QR code with custom icon
                         ctx.font = `bold ${6 * scale}px Arial, sans-serif`;
                         ctx.fillStyle = '#000000';
                         ctx.textAlign = 'center';
-                        ctx.fillText('Visit Website', qrX + displaySize/2, qrY + displaySize + (10 * scale));
+                        ctx.fillText(`${selectedFieldIcons.website.emoji} Visit Website`, qrX + displaySize/2, qrY + displaySize + (10 * scale));
                         
                         // Add website URL below
                         ctx.font = `${5 * scale}px Arial, sans-serif`;
@@ -383,7 +410,7 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
         }, 300); // Debounce to avoid too many re-renders
         
         return () => clearTimeout(timeoutId);
-    }, [data, isModalOpen, selectedBackground, selectedQRPattern]);
+    }, [data, isModalOpen, selectedBackground, selectedQRPattern, selectedFieldIcons]);
 
     // Initial preview render
     useEffect(() => {
@@ -463,11 +490,16 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
             {/* Modal for enlarged preview with customization options */}
             {isModalOpen && (
                 <div 
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4" 
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4" 
+                    style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)'
+                    }}
                     onClick={handleCloseModal}
                 >
                     <div 
-                        className="relative max-w-6xl max-h-screen bg-white rounded-2xl overflow-hidden" 
+                        className="relative max-w-6xl max-h-screen bg-white rounded-2xl overflow-hidden shadow-2xl" 
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close button */}
@@ -486,8 +518,10 @@ const LivePreview = forwardRef<LivePreviewRef, LivePreviewProps>(({ data }, ref)
                             <Customization
                                 selectedBackground={selectedBackground}
                                 selectedQRPattern={selectedQRPattern}
+                                selectedFieldIcons={selectedFieldIcons}
                                 onBackgroundSelect={setSelectedBackground}
                                 onQRPatternSelect={setSelectedQRPattern}
+                                onFieldIconSelect={handleFieldIconSelect}
                             />
                             
                             {/* Preview Canvas */}
