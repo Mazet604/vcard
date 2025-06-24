@@ -207,6 +207,12 @@ const Customization: React.FC<CustomizationProps> = ({
         }
     };
 
+    const handleSectionToggle = (e: React.MouseEvent, section: 'background' | 'icons' | 'qr') => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSection(section);
+    };
+
     return (
         <div className="w-full lg:w-96 bg-gradient-to-br from-gray-50 to-gray-100 border-r border-gray-200 max-h-screen overflow-y-auto">
             {/* Header */}
@@ -226,8 +232,9 @@ const Customization: React.FC<CustomizationProps> = ({
                 {/* Background Colors Section */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transform transition-all duration-200 hover:shadow-md">
                     <button
-                        onClick={() => toggleSection('background')}
+                        onClick={(e) => handleSectionToggle(e, 'background')}
                         className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-all duration-200 hover:cursor-pointer"
+                        type="button"
                     >
                         <div className="flex items-center">
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center mr-3 transform transition-transform duration-200 hover:scale-110">
@@ -243,7 +250,7 @@ const Customization: React.FC<CustomizationProps> = ({
                         <svg 
                             className={`w-5 h-5 text-gray-400 transition-transform duration-300 ease-in-out ${activeSection === 'background' ? 'rotate-180' : ''}`}
                             fill="none" 
-                            stroke="currentColor" 
+                            stroke="currentColor"
                             viewBox="0 0 24 24"
                         >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -293,6 +300,7 @@ const Customization: React.FC<CustomizationProps> = ({
                     <button
                         onClick={() => toggleSection('icons')}
                         className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-all duration-200 hover:cursor-pointer"
+                        type="button"
                     >
                         <div className="flex items-center">
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-green-400 to-blue-400 flex items-center justify-center mr-3 transform transition-transform duration-200 hover:scale-110">
@@ -330,6 +338,7 @@ const Customization: React.FC<CustomizationProps> = ({
                                         <button
                                             onClick={() => setActiveIconField(activeIconField === field ? null : field as FieldIconType)}
                                             className="w-full p-3 flex items-center justify-between text-left hover:bg-gray-50 transition-all duration-200 hover:cursor-pointer"
+                                            type="button"
                                         >
                                             <div className="flex items-center">
                                                 <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 transform transition-transform duration-200 hover:scale-110">
@@ -359,6 +368,7 @@ const Customization: React.FC<CustomizationProps> = ({
                                                                     ? 'border-blue-500 bg-blue-50 shadow-md'
                                                                     : 'border-gray-200 hover:border-gray-300 bg-white'
                                                             }`}
+                                                            type="button"
                                                             title={icon.name}
                                                             style={{
                                                                 animationDelay: `${iconIndex * 30}ms`,
@@ -390,6 +400,7 @@ const Customization: React.FC<CustomizationProps> = ({
                     <button
                         onClick={() => toggleSection('qr')}
                         className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-all duration-200 hover:cursor-pointer"
+                        type="button"
                     >
                         <div className="flex items-center">
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-indigo-400 to-purple-400 flex items-center justify-center mr-3 transform transition-transform duration-200 hover:scale-110">

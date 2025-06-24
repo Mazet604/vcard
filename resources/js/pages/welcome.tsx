@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { usePage, useForm } from '@inertiajs/react';
 import ContactSection from '../components/ContactSection';
 import ImageSection from '../components/ImageSection';
