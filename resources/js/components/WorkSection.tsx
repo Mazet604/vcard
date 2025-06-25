@@ -13,7 +13,8 @@ export default function WorkSection({ data, handleChange, renderError }: WorkSec
             <div className="flex items-center mb-4">
                 <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
                     <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0v2a2 2 0 002 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2V8" />
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" strokeWidth="2"/>
+                        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" strokeWidth="2"/>
                     </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">Work Information</h3>

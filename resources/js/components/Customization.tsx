@@ -169,7 +169,7 @@ const Customization: React.FC<CustomizationProps> = ({
     onFieldIconSelect
 }) => {
     const [activeIconField, setActiveIconField] = useState<FieldIconType | null>(null);
-    const [activeSection, setActiveSection] = useState<'background' | 'icons' | 'qr' | null>('background');
+    const [activeSection, setActiveSection] = useState<'background' | 'icons' | 'qr' | null>(null);
 
     // Handle background selection
     const handleBackgroundSelect = (e: React.MouseEvent, bg: BackgroundOption) => {
