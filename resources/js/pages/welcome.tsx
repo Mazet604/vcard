@@ -1,293 +1,145 @@
-import React, { useState, useRef } from 'react';
-import { usePage, useForm } from '@inertiajs/react';
-import ContactSection from '../components/ContactSection';
-import ImageSection from '../components/ImageSection';
-import SocialSection from '../components/SocialSection';
-import WorkSection from '../components/WorkSection';
-import WorkAddressSection from '../components/WorkAddressSection';
-import PersonalInformationComponent from '../components/PersonalInformationComponent';
-import LivePreview, { LivePreviewRef } from '../components/LivePreview';
+import React from 'react';
+import { Link } from '@inertiajs/react';
 
-type Suffix = {
-    id: number;
-    sfx_name: string;
-};
-
-type FormDataType = {
-    vcard_fname: string;
-    vcard_mname: string;
-    vcard_lname: string;
-    vcard_suffix: string;
-    con_email: string;
-    con_phone: string;
-    img_photo: string | File | null;
-    img_logo: string | File | null;
-    soc_linkedin: string;
-    soc_twitter: string;
-    soc_facebook: string;
-    soc_instagram: string;
-    soc_youtube: string;
-    soc_customlink: string;
-    wrk_org: string;
-    wkr_email: string;
-    wrk_title: string;
-    wrk_role: string;
-    wrk_URL: string;
-    wa_street: string;
-    wa_city: string;
-    wa_state: string;
-    wa_postal_code: string;
-    wa_country: string;
-};
-
-export default function WelcomeForm() {
-    const { suffixes } = usePage<{ suffixes: Suffix[] }>().props;
-    const livePreviewRef = useRef<LivePreviewRef>(null);
-
-    const { data, setData, post, processing, errors } = useForm<FormDataType>({
-        vcard_fname: '',
-        vcard_mname: '',
-        vcard_lname: '',
-        vcard_suffix: '',
-        con_email: '',
-        con_phone: '',
-        img_photo: null,
-        img_logo: null,
-        soc_linkedin: '',
-        soc_twitter: '',
-        soc_facebook: '',
-        soc_instagram: '',
-        soc_youtube: '',
-        soc_customlink: '',
-        wrk_org: '',
-        wkr_email: '',
-        wrk_title: '',
-        wrk_role: '',
-        wrk_URL: '',
-        wa_street: '',
-        wa_city: '',
-        wa_state: '',
-        wa_postal_code: '',
-        wa_country: '',
-    });
-
-    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-    const [logoPreview, setLogoPreview] = useState<string | null>(null);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        if (e.target instanceof HTMLInputElement && e.target.type === "file") {
-            const file = e.target.files ? e.target.files[0] : null;
-            setData(e.target.name as keyof typeof data, file);
-
-            // Preview for images
-            if (file) {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    if (e.target.name === "img_photo") setPhotoPreview(reader.result as string);
-                    if (e.target.name === "img_logo") setLogoPreview(reader.result as string);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                if (e.target.name === "img_photo") setPhotoPreview(null);
-                if (e.target.name === "img_logo") setLogoPreview(null);
-            }
-        } else {
-            setData(e.target.name as keyof typeof data, e.target.value);
+export default function Welcome() {
+    const tools = [
+        {
+            title: 'VCard Generator',
+            description: 'Generate professional digital business cards in VCF and JPG formats',
+            icon: (
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0" />
+                </svg>
+            ),
+            gradient: 'from-red-500 to-orange-500',
+            hoverGradient: 'from-red-600 to-orange-600',
+            route: '/vcard-generator',
+            features: ['Personal & Business Info', 'Social Media Links', 'Photo & Logo Upload', 'VCF & JPG Export']
+        },
+        {
+            title: 'URL Shortener',
+            description: 'Create short, shareable links with click tracking and analytics',
+            icon: (
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+            ),
+            gradient: 'from-blue-500 to-indigo-500',
+            hoverGradient: 'from-blue-600 to-indigo-600',
+            route: '/url-shortener',
+            features: ['Fast URL Shortening', 'Click Tracking', 'Custom Short Codes', 'Analytics Dashboard']
         }
-    };
-
-    const renderError = (field: keyof FormDataType) =>
-        errors[field] && <div className="text-red-500 text-sm mt-1 flex items-center">
-            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-            {errors[field]}
-        </div>;
-
-    const generateVCardData = async () => {
-        let photoBase64 = '';
-        
-        // Convert photo to base64 if it exists
-        if (data.img_photo && data.img_photo instanceof File) {
-            try {
-                photoBase64 = await new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const result = reader.result as string;
-                        // Remove data URL prefix to get just the base64 data
-                        const base64Data = result.split(',')[1];
-                        resolve(base64Data);
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(data.img_photo as File);
-                });
-            } catch (error) {
-                console.error('Error converting photo to base64:', error);
-            }
-        }
-
-        const vCardData = [
-            'BEGIN:VCARD',
-            'VERSION:3.0',
-            `FN:${data.vcard_fname} ${data.vcard_mname} ${data.vcard_lname}`,
-            `N:${data.vcard_lname};${data.vcard_fname};${data.vcard_mname};;`,
-            `EMAIL:${data.con_email}`,
-            `TEL:${data.con_phone}`,
-            `ORG:${data.wrk_org}`,
-            `TITLE:${data.wrk_title}`,
-            `ROLE:${data.wrk_role}`,
-            `EMAIL;TYPE=WORK:${data.wkr_email}`,
-            `URL:${data.wrk_URL}`,
-            `ADR;TYPE=WORK:;;${data.wa_street};${data.wa_city};${data.wa_state};${data.wa_postal_code};${data.wa_country}`,
-            data.soc_linkedin ? `URL;TYPE=LinkedIn:${data.soc_linkedin}` : '',
-            data.soc_twitter ? `URL;TYPE=Twitter:${data.soc_twitter}` : '',
-            data.soc_facebook ? `URL;TYPE=Facebook:${data.soc_facebook}` : '',
-            data.soc_instagram ? `URL;TYPE=Instagram:${data.soc_instagram}` : '',
-            data.soc_youtube ? `URL;TYPE=YouTube:${data.soc_youtube}` : '',
-            data.soc_customlink ? `URL;TYPE=Custom:${data.soc_customlink}` : '',
-            photoBase64 ? `PHOTO;ENCODING=BASE64;TYPE=JPEG:${photoBase64}` : '',
-            'END:VCARD'
-        ].filter(line => line.trim() !== '').join('\n');
-        
-        return vCardData;
-    };
-
-      const handleDownloadVCard = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        const vCardData = await generateVCardData();
-        const blob = new Blob([vCardData], { type: 'text/vcard' });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${data.vcard_fname}_${data.vcard_lname}_vcard.vcf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-    };
-
-    const handleDownloadJPG = async () => {
-        if (livePreviewRef.current) {
-            await livePreviewRef.current.downloadAsJPG();
-        }
-    };
+    ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 py-8 px-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-8 px-4">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{ background: 'linear-gradient(to right, #ff1300, #ff5f00)' }}>
-                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0" />
-                        </svg>
+                <div className="text-center mb-16">
+                    <div className="inline-flex items-center justify-center w-auto h-20 rounded-full mb-6 p-3 bg-white shadow-lg">
+                        <img 
+                            src="/images/lavawhite.png" 
+                            alt="LAVA Logo" 
+                            className="w-full h-full object-cover rounded-full"
+                        />
                     </div>
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">Create Your VCard</h1>
-                    <p className="text-lg text-gray-600">Generate a professional digital business card powered by LAVA Automation</p>
+                    <h1 className="text-5xl font-bold text-gray-900 mb-4">
+                        LAVA <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">Automation</span>
+                    </h1>
+                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                        Your all-in-one digital toolkit. Create professional business cards, shorten URLs, and more with our powerful automation tools.
+                    </p>
                 </div>
 
-                <form className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                    {/* Progress indicator */}
-                    <div className="h-2" style={{ background: 'linear-gradient(to right, #ff1300, #ff5f00)' }}></div>
-                    
-                    <div className="p-8">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            {/* Left Column */}
-                            <div className="space-y-8">
-                                <PersonalInformationComponent 
-                                    data={data}
-                                    suffixes={suffixes}
-                                    handleChange={handleChange}
-                                    renderError={renderError}
-                                />
-                                <ContactSection data={data} handleChange={handleChange} renderError={renderError} />
-                                <ImageSection 
-                                    data={data} 
-                                    handleChange={handleChange} 
-                                    renderError={renderError}
-                                    photoPreview={photoPreview}
-                                    logoPreview={logoPreview}
-                                />
-                                <LivePreview ref={livePreviewRef} data={data} />
-                            </div>
+                {/* Tools Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                    {tools.map((tool, index) => (
+                        <Link
+                            key={index}
+                            href={tool.route}
+                            className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] overflow-hidden"
+                        >
+                            {/* Gradient border effect */}
+                            <div className={`absolute inset-0 bg-gradient-to-r ${tool.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl`}></div>
+                            <div className="relative bg-white m-1 rounded-3xl p-8 h-full">
+                                {/* Icon */}
+                                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r ${tool.gradient} text-white mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                                    {tool.icon}
+                                </div>
 
-                            {/* Right Column */}
-                            <div className="space-y-8">
-                                <SocialSection data={data} handleChange={handleChange} renderError={renderError} />
-                                <WorkSection data={data} handleChange={handleChange} renderError={renderError} />
-                                <WorkAddressSection data={data} handleChange={handleChange} renderError={renderError} />
+                                {/* Content */}
+                                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-gray-800 transition-colors">
+                                    {tool.title}
+                                </h3>
+                                <p className="text-gray-600 mb-6 leading-relaxed">
+                                    {tool.description}
+                                </p>
+
+                                {/* Features */}
+                                <ul className="space-y-2 mb-8">
+                                    {tool.features.map((feature, featureIndex) => (
+                                        <li key={featureIndex} className="flex items-center text-sm text-gray-500">
+                                            <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                            </svg>
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                {/* CTA Button */}
+                                <div className={`inline-flex items-center text-white px-6 py-3 rounded-xl font-semibold bg-gradient-to-r ${tool.gradient} group-hover:${tool.hoverGradient} transition-all duration-300 group-hover:shadow-lg`}>
+                                    <span>Get Started</span>
+                                    <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                </div>
                             </div>
+                        </Link>
+                    ))}
+                </div>
+
+                {/* Features Section */}
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-8">Why Choose LAVA Automation?</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="bg-white rounded-2xl p-6 shadow-lg">
+                            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">Lightning Fast</h3>
+                            <p className="text-gray-600">Generate professional content in seconds with our optimized tools. <b>Tentative</b></p>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            <div className="relative">
-                                {/* Spinning border wrapper */}
-                                <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-spin group-hover:animate-spin" 
-                                    style={{ background: 'conic-gradient(from 0deg, #ff1300, #ff5f00, #ff8533, #ffaa55, #ff1300)' }}>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={handleDownloadVCard}
-                                    className="relative text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:cursor-pointer hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center overflow-hidden group bg-white"
-                                    style={{ 
-                                        background: 'linear-gradient(45deg, #ff1300, #ff5f00)',
-                                    }}
-                                    disabled={!data.vcard_fname || !data.vcard_lname || !data.con_email}
-                                >
-                                    {/* Animated gradient overlay */}
-                                    <div 
-                                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                        style={{
-                                            background: 'linear-gradient(45deg, #ff1300, #ff5f00, #ff8533, #ff1300)',
-                                            backgroundSize: '400% 400%',
-                                            animation: 'gradientShift 2s ease infinite'
-                                        }}
-                                    ></div>
-                                    <svg className="w-5 h-5 mr-2 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    <span className="relative z-10">Download VCard (VCF)</span>
-                                </button>
+                        <div className="bg-white rounded-2xl p-6 shadow-lg">
+                            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                             </div>
-                            
-                            <div className="relative">
-                                {/* Spinning border wrapper */}
-                                <div className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-spin group-hover:animate-spin" 
-                                    style={{ background: 'conic-gradient(from 0deg, #ff5f00, #ff1300, #ff8533, #ffaa55, #ff5f00)' }}>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={handleDownloadJPG}
-                                    className="relative text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl hover:cursor-pointer transform hover:scale-105 transition-all duration-200 flex items-center overflow-hidden group bg-white"
-                                    style={{ 
-                                        background: 'linear-gradient(45deg, #ff5f00, #ff1300)',
-                                    }}
-                                    disabled={!data.vcard_fname || !data.vcard_lname || !data.con_email}
-                                >
-                                    {/* Animated gradient overlay */}
-                                    <div 
-                                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                        style={{
-                                            background: 'linear-gradient(45deg, #ff5f00, #ff1300, #ff8533, #ff5f00)',
-                                            backgroundSize: '400% 400%',
-                                            animation: 'gradientShift 2s ease infinite'
-                                        }}
-                                    ></div>
-                                    <svg className="w-5 h-5 mr-2 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    <span className="relative z-10">Download VCard (JPG)</span>
-                                </button>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">Professional Quality</h3>
+                            <p className="text-gray-600">Create high-quality digital assets that make a lasting impression. <b>Tentative</b></p>
+                        </div>
+
+                        <div className="bg-white rounded-2xl p-6 shadow-lg">
+                            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
                             </div>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">Secure & Private</h3>
+                            <p className="text-gray-600">Your data is processed securely with enterprise-grade encryption. <b>Tentative</b></p>
                         </div>
                     </div>
-                </form>
+                </div>
+
+                {/* Footer */}
+                <div className="text-center">
+                    <p className="text-gray-500">© 2025 LAVA Automation. All Rights Reserved.</p>
+                </div>
             </div>
-            <p className="text-center mt-10">© 2025 LAVA Automation. All Rights Reserved.</p>
         </div>
     );
 }
-
-export type { FormDataType };

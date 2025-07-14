@@ -239,7 +239,7 @@ const Customization: React.FC<CustomizationProps> = ({
                         <div className="flex items-center">
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center mr-3 transform transition-transform duration-200 hover:scale-110">
                                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                             </div>
                             <div>
@@ -305,7 +305,7 @@ const Customization: React.FC<CustomizationProps> = ({
                         <div className="flex items-center">
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-green-400 to-blue-400 flex items-center justify-center mr-3 transform transition-transform duration-200 hover:scale-110">
                                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a1.5 1.5 0 001.5-1.5V7a1.5 1.5 0 00-1.5-1.5H9m0 0a1.5 1.5 0 00-1.5 1.5V9a1.5 1.5 0 001.5 1.5m0-2.5H7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                             </div>
                             <div>
@@ -404,8 +404,8 @@ const Customization: React.FC<CustomizationProps> = ({
                     >
                         <div className="flex items-center">
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-indigo-400 to-purple-400 flex items-center justify-center mr-3 transform transition-transform duration-200 hover:scale-110">
-                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M3 3h7v7H3V3zm1 1v5h5V4H4zM3 14h7v7H3v-7zm1 1v5h5v-5H4zM14 3h7v7h-7V3zm1 1v5h5V4h-5zM5 5h3v3H5V5zm0 10h3v3H5v-3zm10-10h3v3h-3V5zM13 13h1v1h-1v-1zm0 2h1v1h-1v-1zm2-2h1v1h-1v-1zm0 2h1v1h-1v-1zm2-2h1v1h-1v-1zm0 2h1v1h-1v-1zm-2 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1zm0 2h1v1h-1v-1zm-2 0h1v1h-1v-1zm-2 0h1v1h-1v-1z"/>
                                 </svg>
                             </div>
                             <div>

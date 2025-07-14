@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormDataType } from '../pages/welcome';
+import { FormDataType } from '../pages/vcardgenerator';
 
 interface ImageSectionProps {
     data: FormDataType;
@@ -27,13 +27,14 @@ export default function ImageSection({ data, handleChange, renderError, photoPre
                         Profile Photo <span className="text-red-500">*</span>
                     </label>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-red-400 transition-colors">
-                        {photoPreview ? (
+                       {photoPreview ? (
                             <div className="space-y-4">
                                 <img src={photoPreview} alt="Photo Preview" className="mx-auto h-24 w-24 rounded-full object-cover" />
                                 <button
                                     type="button"
                                     onClick={() => document.getElementById('img_photo')?.click()}
-                                    className="hover:cursor-pointer bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors"
+                                    className="hover:cursor-pointer text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                                    style={{ background: 'linear-gradient(45deg, #ff1300, #ff5f00)' }}
                                 >
                                     Change Photo
                                 </button>
@@ -48,13 +49,14 @@ export default function ImageSection({ data, handleChange, renderError, photoPre
                                 <button
                                     type="button"
                                     onClick={() => document.getElementById('img_photo')?.click()}
-                                    className="hover:cursor-pointer bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
+                                    className="hover:cursor-pointer text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                                    style={{ background: 'linear-gradient(45deg, #ff1300, #ff5f00)' }}
                                 >
                                     Upload Photo
                                 </button>
                                 <p className="text-sm text-gray-500">JPG, PNG up to 10MB</p>
                             </div>
-                        )}
+                        )} 
                         <input
                             id="img_photo"
                             name="img_photo"
@@ -79,7 +81,8 @@ export default function ImageSection({ data, handleChange, renderError, photoPre
                                 <button
                                     type="button"
                                     onClick={() => document.getElementById('img_logo')?.click()}
-                                    className="hover:cursor-pointer bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors"
+                                    className="hover:cursor-pointer text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                                    style={{ background: 'linear-gradient(45deg, #ff1300, #ff5f00)' }}
                                 >
                                     Change Logo
                                 </button>
@@ -94,7 +97,8 @@ export default function ImageSection({ data, handleChange, renderError, photoPre
                                 <button
                                     type="button"
                                     onClick={() => document.getElementById('img_logo')?.click()}
-                                    className="hover:cursor-pointer bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
+                                    className="hover:cursor-pointer text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                                    style={{ background: 'linear-gradient(45deg, #ff1300, #ff5f00)' }}
                                 >
                                     Upload Logo
                                 </button>
